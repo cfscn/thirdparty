@@ -41,7 +41,7 @@ func (a *AuthQq) GetRedirectUrl(state string) (*result.CodeResult, error) {
 }
 
 // 获取token
-func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
+func (a *AuthQq) GetWebAccessToken(code string) (*result.TokenResult, error) {
 	url := utils.NewUrlBuilder(a.TokenUrl).
 		AddParam("grant_type", "authorization_code").
 		AddParam("code", code).
@@ -85,8 +85,31 @@ func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
 	return token, nil
 }
 
+// 获取openid
+func (a *AuthQq) GetAppOpenId(accessToken string) (*result.TokenResult, error) {
+	url := utils.NewUrlBuilder(a.OpenIdUrl).
+		AddParam("access_token", accessToken).
+		AddParam("unionid", "1").
+		AddParam("fmt", "json").
+		Build()
+	body, err := utils.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	m2 := utils.JsonToMSS(body)
+	if _, ok := m2["error"]; ok {
+		return nil, errors.New(m2["error_description"])
+	}
+	token := &result.TokenResult{
+		AccessToken: accessToken,
+		OpenId:      m2["openid"],
+		UnionId:     m2["unionid"],
+	}
+	return token, nil
+}
+
 // 获取第三方用户信息
-func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserResult, error) {
+func (a *AuthQq) GetUserInfo(accessToken string, openId string) (*result.UserResult, error) {
 	url := utils.NewUrlBuilder(a.userInfoUrl).
 		AddParam("openid", openId).
 		AddParam("access_token", accessToken).
@@ -103,18 +126,9 @@ func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserRes
 		return nil, errors.New(m["error_description"])
 	}
 	user := &result.UserResult{
-		UUID:      m["id"],
 		UserName:  m["nickname"],
 		NickName:  m["nickname"],
 		AvatarUrl: m["figureurl_2"],
-		Company:   m["company"],
-		Blog:      m["blog"],
-		Location:  m["location"],
-		Email:     m["email"],
-		Remark:    m["bio"],
-		Url:       m["html_url"],
-		CreatedAt: m["created_at"],
-		UpdatedAt: m["updated_at"],
 		Source:    a.registerSource,
 		Gender:    utils.GetRealGender(m["gender"]).Desc,
 	}
