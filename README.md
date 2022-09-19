@@ -15,7 +15,7 @@ func main()  {
 	wxConf := &oauth.AuthConf{
         ClientId: "your app_id", 
         ClientSecret: "your app_secret", 
-        RedirectUrl: "http://www.cfscn.com"}
+        RedirectUrl: "http://www.cfsoft.cn"}
 
 	wxAuth := oauth.NewAuthWxWechat(wxConf)
 	fmt.Print(wxAuth.GetRedirectUrl("sate")) //获取第三方登录地址

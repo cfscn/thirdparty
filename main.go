@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	wxConf := &oauth.AuthConfig{ClientId: "xxx", ClientSecret: "xxx", RedirectUrl: "http://www.cfscn.com"}
+	wxConf := &oauth.AuthConfig{ClientId: "xxx", ClientSecret: "xxx", RedirectUrl: "http://www.cfsoft.cn"}
 
 	wxAuth := oauth.NewAuthWxWechat(wxConf)
 

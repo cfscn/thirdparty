@@ -14,6 +14,7 @@ type AuthConfig struct {
 type BaseRequest struct {
 	authorizeUrl   string      //授权登录URL
 	TokenUrl       string      //获得令牌URL
+	OpenIdUrl      string      // 获取OpenIdURL
 	AccessTokenUrl string      //获得访问令牌URL
 	RefreshUrl     string      //刷新令牌URL
 	userInfoUrl    string      //获取用户信息URL

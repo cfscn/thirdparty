@@ -18,7 +18,8 @@ func NewAuthQq(conf *AuthConfig) *AuthQq {
 
 	authRequest.authorizeUrl = "https://graph.qq.com/oauth2.0/authorize"
 	authRequest.TokenUrl = "https://graph.qq.com/oauth2.0/token"
-	authRequest.userInfoUrl = "https://graph.qq.com/oauth2.0/me"
+	authRequest.OpenIdUrl = "https://graph.qq.com/oauth2.0/me"
+	authRequest.userInfoUrl = "https://graph.qq.com/user/get_user_info"
 
 	return authRequest
 }
@@ -47,31 +48,50 @@ func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
 		AddParam("client_id", a.config.ClientId).
 		AddParam("client_secret", a.config.ClientSecret).
 		AddParam("redirect_uri", a.config.RedirectUrl).
+		AddParam("fmt", "json").
 		Build()
 
 	body, err := utils.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	m := utils.JsonToMSS(body)
-	if _, ok := m["error"]; ok {
-		return nil, errors.New(m["error_description"])
+	m1 := utils.JsonToMSS(body)
+	if _, ok := m1["error"]; ok {
+		return nil, errors.New(m1["error_description"])
+	}
+	// 获取OpenId
+	url = utils.NewUrlBuilder(a.OpenIdUrl).
+		AddParam("access_token", m1["access_token"]).
+		AddParam("unionid", "1").
+		AddParam("fmt", "json").
+		Build()
+	body, err = utils.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	m2 := utils.JsonToMSS(body)
+	if _, ok := m2["error"]; ok {
+		return nil, errors.New(m2["error_description"])
 	}
 	token := &result.TokenResult{
-		AccessToken:  m["access_token"],
-		RefreshToken: m["refresh_token"],
-		ExpireIn:     m["expires_in"],
-		Scope:        m["scope"],
-		TokenType:    m["token_type"],
+		AccessToken:  m1["access_token"],
+		RefreshToken: m1["refresh_token"],
+		ExpireIn:     m1["expires_in"],
+		Scope:        m1["scope"],
+		TokenType:    m1["token_type"],
+		OpenId:       m2["openid"],
+		UnionId:      m2["unionid"],
 	}
 	return token, nil
 }
 
 // 获取第三方用户信息
 func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserResult, error) {
-	url := utils.NewUrlBuilder(a.TokenUrl).
-		AddParam("open_id", openId).
+	url := utils.NewUrlBuilder(a.userInfoUrl).
+		AddParam("openid", openId).
 		AddParam("access_token", accessToken).
+		AddParam("oauth_consumer_key", a.config.ClientId).
+		AddParam("fmt", "json").
 		Build()
 
 	body, err := utils.Get(url)
@@ -84,9 +104,9 @@ func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserRes
 	}
 	user := &result.UserResult{
 		UUID:      m["id"],
-		UserName:  m["login"],
-		NickName:  m["name"],
-		AvatarUrl: m["avatar_url"],
+		UserName:  m["nickname"],
+		NickName:  m["nickname"],
+		AvatarUrl: m["figureurl_2"],
 		Company:   m["company"],
 		Blog:      m["blog"],
 		Location:  m["location"],
@@ -96,7 +116,7 @@ func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserRes
 		CreatedAt: m["created_at"],
 		UpdatedAt: m["updated_at"],
 		Source:    a.registerSource,
-		Gender:    utils.GetRealGender("").Desc,
+		Gender:    utils.GetRealGender(m["gender"]).Desc,
 	}
 	return user, nil
 }

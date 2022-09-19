@@ -7,7 +7,7 @@ import (
 	"github.com/cfscn/thirdparty/utils"
 )
 
-//微博授权登录
+// 微博授权登录
 type AuthWb struct {
 	BaseRequest
 }
@@ -23,7 +23,7 @@ func NewAuthWb(conf *AuthConfig) *AuthWb {
 	return authRequest
 }
 
-//获取登录地址
+// 获取登录地址
 func (a *AuthWb) GetRedirectUrl(state string) (*result.CodeResult, error) {
 	url := utils.NewUrlBuilder(a.authorizeUrl).
 		AddParam("response_type", "code").
@@ -39,7 +39,7 @@ func (a *AuthWb) GetRedirectUrl(state string) (*result.CodeResult, error) {
 	return nil, nil
 }
 
-//获取token
+// 获取token
 func (a *AuthWb) GetToken(code string) (*result.TokenResult, error) {
 	url := utils.NewUrlBuilder(a.TokenUrl).
 		AddParam("grant_type", "authorization_code").
@@ -67,7 +67,7 @@ func (a *AuthWb) GetToken(code string) (*result.TokenResult, error) {
 	return token, nil
 }
 
-//获取第三方用户信息
+// 获取第三方用户信息
 func (a *AuthWb) GetUserInfo(openId string, accessToken string) (*result.UserResult, error) {
 	url := utils.NewUrlBuilder(a.TokenUrl).
 		AddParam("uid", openId).
