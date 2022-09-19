@@ -6,7 +6,7 @@ import (
 	"github.com/geiqin/thirdparty/utils"
 )
 
-//QQ授权登录
+// QQ授权登录
 type AuthQq struct {
 	BaseRequest
 }
@@ -22,7 +22,7 @@ func NewAuthQq(conf *AuthConfig) *AuthQq {
 	return authRequest
 }
 
-//获取登录地址
+// 获取登录地址
 func (a *AuthQq) GetRedirectUrl(state string) (*result.CodeResult, error) {
 	url := utils.NewUrlBuilder(a.authorizeUrl).
 		AddParam("response_type", "code").
@@ -31,14 +31,14 @@ func (a *AuthQq) GetRedirectUrl(state string) (*result.CodeResult, error) {
 		AddParam("state", a.GetState(state)).
 		Build()
 
-	_, err := utils.Post(url)
+	_, err := utils.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-//获取token
+// 获取token
 func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
 	url := utils.NewUrlBuilder(a.TokenUrl).
 		AddParam("grant_type", "authorization_code").
@@ -48,7 +48,7 @@ func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
 		AddParam("redirect_uri", a.config.RedirectUrl).
 		Build()
 
-	body, err := utils.Post(url)
+	body, err := utils.Get(url)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (a *AuthQq) GetToken(code string) (*result.TokenResult, error) {
 	return token, nil
 }
 
-//获取第三方用户信息
+// 获取第三方用户信息
 func (a *AuthQq) GetUserInfo(openId string, accessToken string) (*result.UserResult, error) {
 	url := utils.NewUrlBuilder(a.TokenUrl).
 		AddParam("open_id", openId).

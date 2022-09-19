@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/geiqin/thirdparty/oauth"
 	"log"
+
+	"github.com/geiqin/thirdparty/oauth"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 
 	fmt.Print(wxAuth.GetRedirectUrl("sate")) //获取第三方登录地址
 
-	wxRes, err := wxAuth.GetToken("code")
+	wxRes, err := wxAuth.GetWebAccessToken("code")
 
 	userInfo, _ := wxAuth.GetUserInfo(wxRes.AccessToken, wxRes.OpenId)
 
