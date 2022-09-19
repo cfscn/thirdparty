@@ -3,8 +3,9 @@ package oauth
 import (
 	"encoding/json"
 	"errors"
-	"github.com/geiqin/thirdparty/result"
-	"github.com/geiqin/thirdparty/utils"
+
+	"github.com/cfscn/thirdparty/result"
+	"github.com/cfscn/thirdparty/utils"
 	"github.com/xlstudio/wxbizdatacrypt"
 )
 

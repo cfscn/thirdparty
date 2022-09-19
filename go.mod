@@ -1,4 +1,4 @@
-module github.com/geiqin/thirdparty
+module github.com/cfscn/thirdparty
 
 go 1.14
 

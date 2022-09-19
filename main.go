@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/geiqin/thirdparty/oauth"
+	"github.com/cfscn/thirdparty/oauth"
 )
 
 func main() {
-	wxConf := &oauth.AuthConfig{ClientId: "xxx", ClientSecret: "xxx", RedirectUrl: "http://www.geiqin.com"}
+	wxConf := &oauth.AuthConfig{ClientId: "xxx", ClientSecret: "xxx", RedirectUrl: "http://www.cfscn.com"}
 
 	wxAuth := oauth.NewAuthWxWechat(wxConf)
 

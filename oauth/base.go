@@ -1,10 +1,10 @@
 package oauth
 
 import (
-	"github.com/geiqin/thirdparty/utils"
+	"github.com/cfscn/thirdparty/utils"
 )
 
-//基本配置
+// 基本配置
 type AuthConfig struct {
 	ClientId     string
 	ClientSecret string

@@ -8,14 +8,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/geiqin/thirdparty/oauth"
+	"github.com/cfscn/thirdparty/oauth"
 )
 
 func main()  {
 	wxConf := &oauth.AuthConf{
         ClientId: "your app_id", 
         ClientSecret: "your app_secret", 
-        RedirectUrl: "http://www.geiqin.com"}
+        RedirectUrl: "http://www.cfscn.com"}
 
 	wxAuth := oauth.NewAuthWxWechat(wxConf)
 	fmt.Print(wxAuth.GetRedirectUrl("sate")) //获取第三方登录地址
