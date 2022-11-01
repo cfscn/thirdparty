@@ -19,6 +19,8 @@ func NewAuthWxWechat(conf *AuthConfig) *AuthWxWechat {
 	authRequest.authorizeUrl = "https://open.weixin.qq.com/connect/qrconnect"
 	authRequest.TokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token"
 	authRequest.userInfoUrl = "https://api.weixin.qq.com/sns/userinfo"
+	authRequest.ticketTokenUrl = "https://api.weixin.qq.com/cgi-bin/token"
+	authRequest.ticketUrl = "https://api.weixin.qq.com/cgi-bin/ticket/getticket"
 
 	return authRequest
 }
@@ -101,6 +103,60 @@ func (a *AuthWxWechat) GetAppAccessToken(code string) (*result.TokenResult, erro
 	}
 	if token.AccessToken == "" {
 		return nil, errors.New("获取AccessToken数据为空！")
+	}
+	return token, nil
+}
+
+// 获取分享token
+func (a *AuthWxWechat) GetTicketAccessToken() (*result.TicketResult, error) {
+	url := utils.NewUrlBuilder(a.ticketTokenUrl).
+		AddParam("grant_type", "client_credential").
+		AddParam("appid", a.config.ClientId).
+		AddParam("secret", a.config.ClientSecret).
+		Build()
+
+	body, err := utils.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	m := utils.JsonToMSS(body)
+	if _, ok := m["error"]; ok {
+		return nil, errors.New(m["error_description"])
+	}
+	token := &result.TicketResult{
+		AccessToken: m["access_token"],
+		ExpireIn:    m["expires_in"],
+	}
+	if token.AccessToken == "" {
+		return nil, errors.New("获取AccessToken数据为空！")
+	}
+	return token, nil
+}
+
+// 获取Ticket
+func (a *AuthWxWechat) GetTicket(access_token string) (*result.TicketResult, error) {
+	url := utils.NewUrlBuilder(a.ticketUrl).
+		AddParam("access_token", access_token).
+		AddParam("type", "jsapi").
+		Build()
+
+	body, err := utils.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	m := utils.JsonToMSS(body)
+	if _, ok := m["error"]; ok {
+		return nil, errors.New(m["error_description"])
+	}
+	token := &result.TicketResult{
+		AccessToken: m["access_token"],
+		Ticket:      m["ticket"],
+		ExpireIn:    m["expires_in"],
+		ErrMsg:      m["errmsg"],
+		ErrCode:     m["errcode"],
+	}
+	if token.Ticket == "" {
+		return nil, errors.New("获取Ticket数据为空！")
 	}
 	return token, nil
 }
