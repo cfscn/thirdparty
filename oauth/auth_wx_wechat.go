@@ -120,12 +120,14 @@ func (a *AuthWxWechat) GetTicketAccessToken() (*result.TicketResult, error) {
 		return nil, err
 	}
 	m := utils.JsonToMSS(body)
-	if _, ok := m["error"]; ok {
-		return nil, errors.New(m["error_description"])
+	if _, ok := m["errcode"]; ok {
+		return nil, errors.New(m["errmsg"])
 	}
 	token := &result.TicketResult{
 		AccessToken: m["access_token"],
 		ExpireIn:    m["expires_in"],
+		ErrMsg:      m["errmsg"],
+		ErrCode:     m["errcode"],
 	}
 	if token.AccessToken == "" {
 		return nil, errors.New("获取AccessToken数据为空！")
@@ -145,8 +147,8 @@ func (a *AuthWxWechat) GetTicket(access_token string) (*result.TicketResult, err
 		return nil, err
 	}
 	m := utils.JsonToMSS(body)
-	if _, ok := m["error"]; ok {
-		return nil, errors.New(m["error_description"])
+	if _, ok := m["errcode"]; ok {
+		return nil, errors.New(m["errmsg"])
 	}
 	token := &result.TicketResult{
 		AccessToken: m["access_token"],
